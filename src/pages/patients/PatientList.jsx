@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { deletePatient } from "../../services/patientService";
 import { db } from "../../api/firebaseConfig";
-import { collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { useAuth } from "../../context/AuthContext";
 import PatientForm from "../../components/patients/PatientForm";
 import "./PatientList.css";
