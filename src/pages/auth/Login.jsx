@@ -9,16 +9,19 @@ function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
-  const [password, setPassword] =
-    useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (!email || !password) return;
 
+    setIsLoading(true);
     const { error } = await loginUser(
       email,
       password
     );
+    setIsLoading(false);
 
     if (error) {
       alert(error.message);
@@ -70,6 +73,7 @@ function Login() {
             onChange={(e) =>
               setEmail(e.target.value)
             }
+            required
           />
 
           <label>Password</label>
@@ -81,14 +85,10 @@ function Login() {
             onChange={(e) =>
               setPassword(e.target.value)
             }
+            required
           />
 
           <div className="auth-options">
-
-            <label>
-              <input type="checkbox" />
-              Remember for 30 days
-            </label>
 
             <span>
               Forgot password
@@ -99,8 +99,9 @@ function Login() {
           <button
             type="submit"
             className="signin-btn"
+            disabled={isLoading}
           >
-            Sign in
+            {isLoading ? "Signing in..." : "Sign in"}
           </button>
 
         </form>

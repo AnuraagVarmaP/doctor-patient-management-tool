@@ -9,16 +9,19 @@ function Register() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
-  const [password, setPassword] =
-    useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    if (!email || !password) return;
 
+    setIsLoading(true);
     const { error } = await registerUser(
       email,
       password
     );
+    setIsLoading(false);
 
     if (error) {
       alert(error.message);
@@ -72,6 +75,7 @@ function Register() {
             onChange={(e) =>
               setEmail(e.target.value)
             }
+            required
           />
 
           <label>Password</label>
@@ -83,13 +87,15 @@ function Register() {
             onChange={(e) =>
               setPassword(e.target.value)
             }
+            required
           />
 
           <button
             type="submit"
             className="signin-btn"
+            disabled={isLoading}
           >
-            Sign up
+            {isLoading ? "Signing up..." : "Sign up"}
           </button>
 
         </form>
