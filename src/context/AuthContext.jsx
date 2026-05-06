@@ -5,9 +5,9 @@ import {
   useState,
 } from "react";
 
-import { auth } from "../api/firebaseConfig";
+import { auth, db } from "../api/firebaseConfig";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { getDoctorProfile } from "../services/doctorService";
+import { doc, onSnapshot } from "firebase/firestore";
 
 const AuthContext = createContext();
 
@@ -22,9 +22,11 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }, 2000);
 
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      clearTimeout(safetyTimeout);
+    let unsubProfile = () => {};
 
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      clearTimeout(safetyTimeout);
+      
       if (user) {
         const normalizedSession = {
           user: {
@@ -33,24 +35,28 @@ export const AuthProvider = ({ children }) => {
           }
         };
         setSession(normalizedSession);
-
         setLoading(false);
 
-        // Fetch profile silently in the background
-        getDoctorProfile(user.uid)
-          .then(({ data }) => {
-            if (data) setDoctorProfile(data);
-          })
-          .catch((err) => console.error("Background profile fetch failed:", err));
+        // 🔥 REAL-TIME PROFILE LISTENER
+        const profileRef = doc(db, "doctors", user.uid);
+        unsubProfile = onSnapshot(profileRef, (docSnap) => {
+          if (docSnap.exists()) {
+            setDoctorProfile({ id: docSnap.id, ...docSnap.data() });
+          } else {
+            setDoctorProfile(null);
+          }
+        });
       } else {
         setSession(null);
         setDoctorProfile(null);
         setLoading(false);
+        unsubProfile();
       }
     });
 
     return () => {
       unsubscribe();
+      unsubProfile();
       clearTimeout(safetyTimeout);
     };
   }, []);

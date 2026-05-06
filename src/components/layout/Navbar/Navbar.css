@@ -40,6 +40,26 @@
   position: relative;
 }
 
+.profile-info-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.profile-info-display:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.navbar-doctor-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #334155;
+}
+
 .profile-icon {
   font-size: 22px;
   cursor: pointer;

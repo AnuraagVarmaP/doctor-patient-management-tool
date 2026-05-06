@@ -53,12 +53,15 @@ function Navbar() {
           <div className="profile-section">
 
             <div
-              className="profile-icon"
-              onClick={() =>
-                setProfileOpen(!profileOpen)
-              }
+              className="profile-info-display"
+              onClick={() => setProfileOpen(!profileOpen)}
             >
-              👤
+              <span className="navbar-doctor-name">
+                {doctorProfile?.name ? `Dr. ${doctorProfile.name}` : "Doctor"}
+              </span>
+              <div className="profile-icon">
+                👤
+              </div>
             </div>
 
             {profileOpen && (
