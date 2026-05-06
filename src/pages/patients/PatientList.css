@@ -1,0 +1,135 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+.patient-list-container {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #f2f2f2;
+  min-height: 100vh;
+}
+
+.patient-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.patient-header h1 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-size: 36px;
+  margin: 0;
+  color: #000000;
+  text-transform: uppercase;
+}
+
+.patient-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.patient-card {
+  background: #ffffff;
+  border-radius: 0;
+  border: 1px solid #e0e0e0;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s ease;
+}
+
+.patient-card:hover {
+  border-color: #000000;
+}
+
+.patient-card h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #000000;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.patient-info {
+  margin-bottom: 24px;
+  flex-grow: 1;
+}
+
+.patient-info p {
+  margin: 8px 0;
+  color: #666666;
+  font-size: 15px;
+}
+
+.patient-info strong {
+  color: #000000;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  margin-right: 8px;
+}
+
+.patient-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.patient-actions button {
+  flex: 1;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  padding: 12px;
+  border-radius: 0;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background-color: #000000;
+  color: #ffffff;
+  border: 1px solid #000000;
+}
+
+.btn-primary:hover {
+  background-color: transparent;
+  color: #000000;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: #000000;
+  border: 1px solid #e0e0e0;
+}
+
+.btn-secondary:hover {
+  border-color: #000000;
+}
+
+.btn-danger {
+  background-color: transparent;
+  color: #d32f2f;
+  border: 1px solid #e0e0e0;
+}
+
+.btn-danger:hover {
+  border-color: #d32f2f;
+}
+
+.no-patients {
+  text-align: center;
+  color: #666666;
+  padding: 60px 20px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 0;
+  font-size: 16px;
+}

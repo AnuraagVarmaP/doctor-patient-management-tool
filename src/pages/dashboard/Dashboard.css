@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+.dashboard-container {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #f2f2f2;
+  min-height: 100vh;
+}
+
+.dashboard-header {
+  margin-bottom: 40px;
+}
+
+.dashboard-header h1 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-size: 36px;
+  margin: 0 0 10px 0;
+  color: #000000;
+  text-transform: uppercase;
+}
+
+.dashboard-header p {
+  color: #666666;
+  font-size: 16px;
+}
+
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.stat-card {
+  background: #ffffff;
+  padding: 30px;
+  border: 1px solid #e0e0e0;
+  text-align: center;
+}
+
+.stat-card h3 {
+  font-size: 48px;
+  font-weight: 800;
+  margin: 0;
+  color: #000000;
+}
+
+.stat-card p {
+  color: #666666;
+  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-top: 10px;
+}
+
+.dashboard-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.action-card {
+  background: #ffffff;
+  padding: 40px 30px;
+  border: 1px solid #e0e0e0;
+  text-align: left;
+  transition: border-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.action-card:hover {
+  border-color: #000000;
+}
+
+.action-card h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #000000;
+  margin-top: 0;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+
+.action-card p {
+  color: #666666;
+  margin-bottom: 24px;
+  flex-grow: 1;
+}
+
+.action-card button {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  padding: 14px 24px;
+  background-color: #000000;
+  color: #ffffff;
+  border: 1px solid #000000;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+}
+
+.action-card button:hover {
+  background-color: transparent;
+  color: #000000;
+}

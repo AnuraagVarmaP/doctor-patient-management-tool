@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+.patient-details-container {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  padding: 40px 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+  background-color: #f2f2f2;
+  min-height: 100vh;
+}
+
+.patient-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.patient-info-card {
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 0;
+  border: 1px solid #e0e0e0;
+  margin-bottom: 40px;
+}
+
+.patient-info-card h2 {
+  margin-top: 0;
+  margin-bottom: 24px;
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #000000;
+  text-transform: uppercase;
+}
+
+.patient-info-card p {
+  color: #666666;
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.patient-info-card strong {
+  color: #000000;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  margin-right: 12px;
+  display: inline-block;
+  width: 120px;
+}
+
+.visits-section {
+  background: transparent;
+}
+
+.visits-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.visits-header h3 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: #000000;
+}
+
+.visit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.visit-card {
+  border: 1px solid #e0e0e0;
+  padding: 30px;
+  border-radius: 0;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  transition: border-color 0.2s ease;
+}
+
+.visit-card:hover {
+  border-color: #000000;
+}
+
+.visit-content {
+  flex-grow: 1;
+}
+
+.visit-content h4 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #000000;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.visit-content p {
+  margin: 8px 0;
+  line-height: 1.6;
+  color: #666666;
+  font-size: 15px;
+}
+
+.visit-content strong {
+  color: #000000;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  margin-right: 8px;
+}
+
+.visit-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-left: 40px;
+  min-width: 120px;
+}
+
+.no-visits {
+  text-align: center;
+  color: #666666;
+  padding: 60px 20px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 0;
+  font-size: 16px;
+}

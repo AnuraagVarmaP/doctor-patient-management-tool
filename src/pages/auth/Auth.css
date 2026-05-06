@@ -1,68 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
 .auth-container {
+  font-family: 'Plus Jakarta Sans', sans-serif;
   width: 100%;
   min-height: 100vh;
-  background-color: #f8fafc;
-
+  background-color: #f2f2f2;
   display: flex;
   justify-content: center;
   align-items: center;
-
   padding: 20px;
   box-sizing: border-box;
 }
 
 .auth-card {
   width: 100%;
-  max-width: 420px;
-
-  background-color: white;
-
-  padding: 40px;
-
-  border-radius: 16px;
-
-  box-shadow: 0px 4px 20px rgba(0,0,0,0.08);
-
+  max-width: 480px;
+  background-color: #ffffff;
+  padding: 60px 40px;
+  border: 1px solid #e0e0e0;
   text-align: center;
 }
 
 .auth-logo {
-  font-size: 34px;
-  margin-bottom: 20px;
+  font-size: 40px;
+  margin-bottom: 24px;
 }
 
 .auth-card h1 {
-  font-size: 32px;
-  margin-bottom: 10px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-size: 36px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  color: #000000;
 }
 
 .auth-card p {
-  color: #64748b;
-  margin-bottom: 24px;
+  color: #666666;
+  margin-bottom: 32px;
+  font-size: 14px;
 }
 
 .auth-tabs {
   display: flex;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 }
 
 .auth-tabs button {
+  font-family: 'Plus Jakarta Sans', sans-serif;
   flex: 1;
-
-  padding: 12px;
-
-  border: 1px solid #d1d5db;
-
-  background-color: white;
-
+  padding: 14px;
+  border: 1px solid #e0e0e0;
+  background-color: #ffffff;
+  color: #666666;
   cursor: pointer;
-
-  font-size: 15px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 0;
+  transition: all 0.2s ease;
 }
 
-.active-tab {
-  background-color: #7c3aed !important;
-  color: white;
+.auth-tabs a {
+  flex: 1;
+  display: flex;
+  text-decoration: none;
+}
+
+.auth-tabs a button {
+  width: 100%;
+}
+
+.auth-tabs button.active-tab {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-color: #000000;
 }
 
 form {
@@ -72,97 +84,116 @@ form {
 }
 
 form label {
+  color: #000000;
   margin-bottom: 8px;
-  font-weight: 500;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 form input {
+  font-family: 'Plus Jakarta Sans', sans-serif;
   padding: 14px;
-  margin-bottom: 18px;
+  margin-bottom: 24px;
+  border: 1px solid #000000;
+  border-radius: 0;
+  font-size: 16px;
+  background-color: transparent;
+  color: #000000;
+}
 
-  border: 1px solid #d1d5db;
-
-  border-radius: 10px;
-
-  font-size: 15px;
+form input:focus {
+  outline: none;
+  border-width: 2px;
+  padding: 13px;
 }
 
 .auth-options {
   display: flex;
-  justify-content: space-between;
-
+  justify-content: flex-end;
   align-items: center;
-
-  margin-bottom: 24px;
-
+  margin-bottom: 32px;
   font-size: 14px;
 }
 
 .auth-options span {
-  color: #7c3aed;
+  color: #666666;
   cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.auth-options span:hover {
+  color: #000000;
 }
 
 .signin-btn {
+  font-family: 'Plus Jakarta Sans', sans-serif;
   width: 100%;
-
-  padding: 14px;
-
-  background-color: #7c3aed;
-
-  color: white;
-
-  border: none;
-
-  border-radius: 10px;
-
-  font-size: 16px;
-
+  padding: 16px;
+  background-color: #000000;
+  color: #ffffff;
+  border: 1px solid #000000;
+  border-radius: 0;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   cursor: pointer;
-
   margin-bottom: 20px;
+  transition: all 0.2s ease;
 }
 
 .signin-btn:hover {
-  background-color: #6d28d9;
+  background-color: transparent;
+  color: #000000;
+}
+
+.signin-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #666666;
+  border-color: #666666;
 }
 
 .google-btn {
+  font-family: 'Plus Jakarta Sans', sans-serif;
   width: 100%;
-
-  padding: 14px;
-
-  border: 1px solid #d1d5db;
-
-  background-color: white;
-
-  border-radius: 10px;
-
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  background-color: transparent;
+  color: #000000;
+  border-radius: 0;
   cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  transition: all 0.2s ease;
+}
 
-  font-size: 15px;
-
-  margin-bottom: 20px;
+.google-btn:hover {
+  border-color: #000000;
 }
 
 .bottom-text {
   text-align: center;
   font-size: 14px;
+  color: #666666;
 }
 
 .bottom-text a {
-  color: #7c3aed;
-  text-decoration: none;
-  font-weight: 600;
+  color: #000000;
+  text-decoration: underline;
+  font-weight: 700;
 }
 
 @media screen and (max-width: 480px) {
-
   .auth-card {
-    padding: 24px;
+    padding: 40px 20px;
   }
-
   .auth-card h1 {
-    font-size: 26px;
+    font-size: 28px;
   }
 }

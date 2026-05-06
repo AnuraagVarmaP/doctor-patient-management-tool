@@ -8,11 +8,14 @@ function App() {
   const { session } = useAuth();
 
   return (
-    <>
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       {session && <Navbar />}
 
-      <AppRoutes />
-    </>
+      <div style={{ flexGrow: 1 }}>
+        <AppRoutes />
+      </div>
+      
+    </div>
   );
 }
 
