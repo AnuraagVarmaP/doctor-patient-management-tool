@@ -106,15 +106,32 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  if (loading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '16px',
+        color: '#64748b',
+        fontFamily: 'sans-serif'
+      }}>
+        Loading...
+      </div>
+    );
+  }
+
   return (
     <AuthContext.Provider
       value={{
         session,
         doctorProfile,
         refreshProfile,
+        loading,
       }}
     >
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 };
