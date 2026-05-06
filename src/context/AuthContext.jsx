@@ -89,14 +89,9 @@ export const AuthProvider = ({ children }) => {
   }, [session]);
 
   const refreshProfile = async () => {
-    if (session?.user?.id) {
-      try {
-        const { data } = await getDoctorProfile(session.user.id);
-        setDoctorProfile(data || null);
-      } catch (err) {
-        console.error("Refresh profile failed:", err);
-      }
-    }
+    // Redundant now that we have a real-time onSnapshot listener!
+    // Keeping the function signature to avoid breaking components like Register.jsx
+    return Promise.resolve();
   };
 
   if (loading) {
