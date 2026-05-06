@@ -18,11 +18,7 @@ function PatientDetails() {
   const [isVisitFormOpen, setIsVisitFormOpen] = useState(false);
   const [editingVisit, setEditingVisit] = useState(null);
 
-  useEffect(() => {
-    fetchData();
-  }, [id, session]);
-
-  const fetchData = async () => {
+  const fetchData = React.useCallback(async () => {
     setIsLoading(true);
     const doctorId = session?.user?.id;
     if (doctorId && id) {
@@ -41,7 +37,11 @@ function PatientDetails() {
       }
     }
     setIsLoading(false);
-  };
+  }, [id, session, navigate]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleDeleteVisit = async (visitId) => {
     if (window.confirm("Are you sure you want to delete this visit record?")) {
