@@ -88,13 +88,6 @@ function Login() {
             required
           />
 
-          <div className="auth-options">
-
-            <span>
-              Forgot password
-            </span>
-
-          </div>
 
           <button
             type="submit"
@@ -105,10 +98,6 @@ function Login() {
           </button>
 
         </form>
-
-        <button className="google-btn">
-          Sign in with Google
-        </button>
 
         <p className="bottom-text">
           Don't have an account?{" "}

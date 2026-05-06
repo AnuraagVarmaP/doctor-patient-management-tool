@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { createPatient, updatePatient } from "../../services/patientService";
 import { useAuth } from "../../context/AuthContext";
-import "./PatientForm.css"; // We'll add some basic styling
+import "./PatientForm.css";
 
 const PatientForm = ({ existingPatient, onSave, onCancel }) => {
   const { session } = useAuth();

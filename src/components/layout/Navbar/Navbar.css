@@ -77,6 +77,24 @@
   background-color: #dc2626;
 }
 
+.edit-profile-btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #e2e8f0;
+  background-color: transparent;
+  color: #1e293b !important;
+  border-radius: 6px;
+  text-align: center;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.edit-profile-btn:hover {
+  background-color: #f8fafc;
+}
+
 .mobile-toggle {
   display: none;
   font-size: 24px;

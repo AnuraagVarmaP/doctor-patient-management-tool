@@ -9,7 +9,7 @@ import { useAuth } from "../../../context/AuthContext";
 function Navbar() {
   const navigate = useNavigate();
 
-  const { session } = useAuth();
+  const { session, doctorProfile } = useAuth();
 
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -65,7 +65,7 @@ function Navbar() {
               <div className="profile-dropdown">
 
                 <p className="profile-email">
-                  {session?.user?.email}
+                  {doctorProfile?.name ? `Dr. ${doctorProfile.name}` : (session?.user?.email || "User")}
                 </p>
 
                 <button

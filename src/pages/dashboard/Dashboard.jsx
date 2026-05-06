@@ -5,7 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import "./Dashboard.css";
 
 function Dashboard() {
-  const { session } = useAuth();
+  const { session, doctorProfile } = useAuth();
   const navigate = useNavigate();
   const [patientCount, setPatientCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,8 +31,8 @@ function Dashboard() {
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
-        <h1>Welcome Back, Doctor</h1>
-        <p>{doctorEmail}</p>
+        <h1>Welcome Back, {doctorProfile?.name ? `Dr. ${doctorProfile.name}` : "Doctor"}</h1>
+        <p>{doctorProfile?.designation || doctorEmail || "No Email"}</p>
       </div>
 
       {isLoading ? (

@@ -1,6 +1,7 @@
 import AppRoutes from "./routes/AppRoutes";
 
 import Navbar from "./components/layout/Navbar/Navbar";
+import Footer from "./components/layout/Footer/Footer";
 
 import { useAuth } from "./context/AuthContext";
 
@@ -15,6 +16,7 @@ function App() {
         <AppRoutes />
       </div>
       
+      <Footer />
     </div>
   );
 }
