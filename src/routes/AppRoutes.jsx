@@ -1,5 +1,4 @@
 import {
-  BrowserRouter,
   Routes,
   Route,
 } from "react-router-dom";
@@ -13,39 +12,37 @@ import ProtectedRoute from "./ProtectedRoute";
 
 function AppRoutes() {
   return (
-    <BrowserRouter>
-      <Routes>
+    <Routes>
 
-        <Route
-          path="/"
-          element={<Login />}
-        />
+      <Route
+        path="/"
+        element={<Login />}
+      />
 
-        <Route
-          path="/register"
-          element={<Register />}
-        />
+      <Route
+        path="/register"
+        element={<Register />}
+      />
 
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/patients"
-          element={
-            <ProtectedRoute>
-              <PatientList />
-            </ProtectedRoute>
-          }
-        />
+      <Route
+        path="/patients"
+        element={
+          <ProtectedRoute>
+            <PatientList />
+          </ProtectedRoute>
+        }
+      />
 
-      </Routes>
-    </BrowserRouter>
+    </Routes>
   );
 }
 

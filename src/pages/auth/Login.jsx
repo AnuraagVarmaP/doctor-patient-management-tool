@@ -1,59 +1,124 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+
+import "./Auth.css";
+
 import { loginUser } from "../../services/authService";
-import { useNavigate } from "react-router-dom";
 
 function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [password, setPassword] =
+    useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    const { data, error } = await loginUser(email, password);
+    const { error } = await loginUser(
+      email,
+      password
+    );
 
     if (error) {
       alert(error.message);
       return;
     }
 
-    console.log(data);
-
-    alert("Login Successful");
-
     navigate("/dashboard");
   };
 
   return (
-    <div>
-      <h1>Login</h1>
+    <div className="auth-container">
 
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Enter Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+      <div className="auth-card">
 
-        <br />
-        <br />
+        <div className="auth-logo">
+          🩺
+        </div>
 
-        <input
-          type="password"
-          placeholder="Enter Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <h1>
+          Log in to your account
+        </h1>
 
-        <br />
-        <br />
+        <p>
+          Welcome back! Please enter your details.
+        </p>
 
-        <button type="submit">
-          Login
+        <div className="auth-tabs">
+
+          <Link to="/register">
+            <button>
+              Sign up
+            </button>
+          </Link>
+
+          <button className="active-tab">
+            Log in
+          </button>
+
+        </div>
+
+        <form onSubmit={handleLogin}>
+
+          <label>Email</label>
+
+          <input
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
+          />
+
+          <label>Password</label>
+
+          <input
+            type="password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
+          />
+
+          <div className="auth-options">
+
+            <label>
+              <input type="checkbox" />
+              Remember for 30 days
+            </label>
+
+            <span>
+              Forgot password
+            </span>
+
+          </div>
+
+          <button
+            type="submit"
+            className="signin-btn"
+          >
+            Sign in
+          </button>
+
+        </form>
+
+        <button className="google-btn">
+          Sign in with Google
         </button>
-      </form>
+
+        <p className="bottom-text">
+          Don't have an account?{" "}
+
+          <Link to="/register">
+            Sign up
+          </Link>
+        </p>
+
+      </div>
+
     </div>
   );
 }

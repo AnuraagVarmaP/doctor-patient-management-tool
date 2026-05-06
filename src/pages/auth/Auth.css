@@ -1,0 +1,168 @@
+.auth-container {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f8fafc;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+
+  background-color: white;
+
+  padding: 40px;
+
+  border-radius: 16px;
+
+  box-shadow: 0px 4px 20px rgba(0,0,0,0.08);
+
+  text-align: center;
+}
+
+.auth-logo {
+  font-size: 34px;
+  margin-bottom: 20px;
+}
+
+.auth-card h1 {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.auth-card p {
+  color: #64748b;
+  margin-bottom: 24px;
+}
+
+.auth-tabs {
+  display: flex;
+  margin-bottom: 24px;
+}
+
+.auth-tabs button {
+  flex: 1;
+
+  padding: 12px;
+
+  border: 1px solid #d1d5db;
+
+  background-color: white;
+
+  cursor: pointer;
+
+  font-size: 15px;
+}
+
+.active-tab {
+  background-color: #7c3aed !important;
+  color: white;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+form label {
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+form input {
+  padding: 14px;
+  margin-bottom: 18px;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 10px;
+
+  font-size: 15px;
+}
+
+.auth-options {
+  display: flex;
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-bottom: 24px;
+
+  font-size: 14px;
+}
+
+.auth-options span {
+  color: #7c3aed;
+  cursor: pointer;
+}
+
+.signin-btn {
+  width: 100%;
+
+  padding: 14px;
+
+  background-color: #7c3aed;
+
+  color: white;
+
+  border: none;
+
+  border-radius: 10px;
+
+  font-size: 16px;
+
+  cursor: pointer;
+
+  margin-bottom: 20px;
+}
+
+.signin-btn:hover {
+  background-color: #6d28d9;
+}
+
+.google-btn {
+  width: 100%;
+
+  padding: 14px;
+
+  border: 1px solid #d1d5db;
+
+  background-color: white;
+
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  font-size: 15px;
+
+  margin-bottom: 20px;
+}
+
+.bottom-text {
+  text-align: center;
+  font-size: 14px;
+}
+
+.bottom-text a {
+  color: #7c3aed;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+@media screen and (max-width: 480px) {
+
+  .auth-card {
+    padding: 24px;
+  }
+
+  .auth-card h1 {
+    font-size: 26px;
+  }
+}
