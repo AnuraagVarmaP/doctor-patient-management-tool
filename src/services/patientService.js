@@ -52,9 +52,9 @@ export const getPatientById = async (id, doctorId) => {
 
 export const createPatient = async (patientData) => {
   try {
-    // 🔥 INSTANT SAVE FIX: Generate ID locally
+    // Generate ID locally for instant response
     const patientsRef = collection(db, "patients");
-    const newDocRef = doc(patientsRef); // Generates ID instantly without network
+    const newDocRef = doc(patientsRef);
     const id = newDocRef.id;
 
     const dataToSave = {
@@ -63,8 +63,6 @@ export const createPatient = async (patientData) => {
       created_at: serverTimestamp()
     };
 
-    // We don't await the setDoc if we want it to be truly instant, 
-    // but awaiting it with Firestore persistence is usually < 50ms.
     await setDoc(newDocRef, dataToSave);
     
     return { 
@@ -80,7 +78,11 @@ export const createPatient = async (patientData) => {
 export const updatePatient = async (id, doctorId, patientData) => {
   try {
     const docRef = doc(db, "patients", id);
-    await updateDoc(docRef, patientData);
+    // Use updateDoc for targeted updates
+    await updateDoc(docRef, {
+      ...patientData,
+      updated_at: serverTimestamp()
+    });
     
     return { 
       data: [{ id, ...patientData }], 

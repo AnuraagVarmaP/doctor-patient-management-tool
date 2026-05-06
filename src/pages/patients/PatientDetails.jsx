@@ -14,17 +14,22 @@ function PatientDetails() {
 
   const [patient, setPatient] = useState(null);
   const [visits, setVisits] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const [isVisitFormOpen, setIsVisitFormOpen] = useState(false);
   const [editingVisit, setEditingVisit] = useState(null);
 
-  /* ── ⚡ REAL-TIME LISTENERS ⚡ ── */
+  /* ── ⚡ ROBUST REAL-TIME LISTENERS ⚡ ── */
   useEffect(() => {
     const doctorId = session?.user?.id;
-    if (!doctorId || !id) return;
+    if (!doctorId || !id) {
+      setIsInitialLoading(false);
+      return;
+    }
 
-    setIsLoading(true);
+    setIsInitialLoading(true);
+    setIsSyncing(true);
 
     // 1. Listen to Patient Data
     const patientRef = doc(db, "patients", id);
@@ -34,14 +39,18 @@ function PatientDetails() {
         if (data.doctor_id === doctorId) {
           setPatient({ id: docSnap.id, ...data });
         } else {
-          console.error("Access denied to patient");
+          console.error("Access denied to patient profile");
           navigate("/patients");
         }
       } else {
-        console.error("Patient not found");
+        console.error("Patient document not found in Firestore");
         navigate("/patients");
       }
-      setIsLoading(false);
+      setIsInitialLoading(false);
+      setIsSyncing(false);
+    }, (error) => {
+      console.error("Patient profile listener error:", error);
+      setIsInitialLoading(false);
     });
 
     // 2. Listen to Visits
@@ -59,6 +68,16 @@ function PatientDetails() {
         ...doc.data()
       }));
       setVisits(data);
+      setIsInitialLoading(false);
+      setIsSyncing(false);
+    }, (error) => {
+      // CRITICAL: If you see a "Query requires an index" error here, 
+      // check your browser console and click the link to create it!
+      console.error("Visits list listener error:", error);
+      if (error.code === 'failed-precondition') {
+        console.warn("TIP: This query likely needs a Firestore Index. Check the link above.");
+      }
+      setIsInitialLoading(false);
     });
 
     return () => {
@@ -72,16 +91,15 @@ function PatientDetails() {
       const doctorId = session?.user?.id;
       const { error } = await deleteVisit(visitId, doctorId);
       if (error) {
-        alert(error.message);
+        alert("Delete failed: " + error.message);
       }
-      // No need to fetchData() anymore, onSnapshot handles it!
     }
   };
 
-  const handleSaveVisit = (savedVisit) => {
+  const handleSaveVisit = () => {
     setIsVisitFormOpen(false);
     setEditingVisit(null);
-    // No need to fetchData() anymore!
+    // UI will update automatically via onSnapshot
   };
 
   const openEditVisitForm = (visit) => {
@@ -89,7 +107,16 @@ function PatientDetails() {
     setIsVisitFormOpen(true);
   };
 
-  if (isLoading) return <div className="patient-details-container"><p>Loading...</p></div>;
+  if (isInitialLoading) {
+    return (
+      <div className="patient-details-container">
+        <div className="loading-spinner-wrap">
+          <p>Connecting to database...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!patient) return null;
 
   return (
@@ -98,19 +125,24 @@ function PatientDetails() {
         <button className="btn-secondary" onClick={() => navigate("/patients")}>
           &larr; Back to Patients
         </button>
+        {isSyncing && <span className="sync-indicator">Syncing...</span>}
       </div>
 
       <div className="patient-info-card">
         <h2>{patient.name}</h2>
-        <p><strong>Age:</strong> {patient.age || "N/A"}</p>
-        <p><strong>Gender:</strong> {patient.gender || "N/A"}</p>
-        <p><strong>Contact Info:</strong> {patient.contact_info || "N/A"}</p>
-        <p><strong>Added On:</strong> {patient.created_at ? new Date(patient.created_at?.toDate?.() || patient.created_at).toLocaleDateString() : "N/A"}</p>
+        <div className="patient-meta">
+          <p><strong>Age:</strong> {patient.age || "N/A"}</p>
+          <p><strong>Gender:</strong> {patient.gender || "N/A"}</p>
+          <p><strong>Contact:</strong> {patient.contact_info || "N/A"}</p>
+        </div>
+        <p className="added-date">
+          Member since: {patient.created_at ? new Date(patient.created_at?.toDate?.() || patient.created_at).toLocaleDateString() : "Just now"}
+        </p>
       </div>
 
       <div className="visits-section">
         <div className="visits-header">
-          <h3>Visit Records</h3>
+          <h3>Visit History</h3>
           <button className="btn-primary" onClick={() => setIsVisitFormOpen(true)}>
             + Add Visit Record
           </button>
@@ -118,23 +150,40 @@ function PatientDetails() {
 
         {visits.length === 0 ? (
           <div className="no-visits">
-            <p>No visit records found for this patient.</p>
+            <p>No visit records found. Create the first record for this patient.</p>
           </div>
         ) : (
           <div className="visit-list">
             {visits.map((visit) => (
               <div key={visit.id} className="visit-card">
                 <div className="visit-content">
-                  <h4>{new Date(visit.visit_date).toLocaleDateString()}</h4>
-                  {visit.diagnosis && <p><strong>Diagnosis:</strong> {visit.diagnosis}</p>}
-                  {visit.prescription && <p><strong>Prescription:</strong> {visit.prescription}</p>}
-                  {visit.notes && <p><strong>Notes:</strong> {visit.notes}</p>}
+                  <span className="visit-date">
+                    {new Date(visit.visit_date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                  </span>
+                  {visit.diagnosis && (
+                    <div className="visit-detail">
+                      <label>Diagnosis</label>
+                      <p>{visit.diagnosis}</p>
+                    </div>
+                  )}
+                  {visit.prescription && (
+                    <div className="visit-detail">
+                      <label>Prescription</label>
+                      <p className="prescription-text">{visit.prescription}</p>
+                    </div>
+                  )}
+                  {visit.notes && (
+                    <div className="visit-detail">
+                      <label>Notes</label>
+                      <p className="notes-text">{visit.notes}</p>
+                    </div>
+                  )}
                 </div>
                 <div className="visit-actions">
-                  <button className="btn-secondary" onClick={() => openEditVisitForm(visit)}>
+                  <button className="btn-icon" onClick={() => openEditVisitForm(visit)} title="Edit">
                     Edit
                   </button>
-                  <button className="btn-danger" onClick={() => handleDeleteVisit(visit.id)}>
+                  <button className="btn-icon btn-danger-text" onClick={() => handleDeleteVisit(visit.id)} title="Delete">
                     Delete
                   </button>
                 </div>
