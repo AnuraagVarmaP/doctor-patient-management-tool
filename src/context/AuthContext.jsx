@@ -17,14 +17,14 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Safety timeout: if auth takes more than 5s, stop loading anyway
+    // Safety timeout: if auth takes more than 2s, stop loading anyway
     const safetyTimeout = setTimeout(() => {
       setLoading(false);
-    }, 5000);
+    }, 2000);
 
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       clearTimeout(safetyTimeout);
-      
+
       if (user) {
         const normalizedSession = {
           user: {
@@ -34,13 +34,14 @@ export const AuthProvider = ({ children }) => {
         };
         setSession(normalizedSession);
 
-        // Fetch profile in the background so it doesn't block the app from appearing
+        setLoading(false);
+
+        // Fetch profile silently in the background
         getDoctorProfile(user.uid)
           .then(({ data }) => {
             if (data) setDoctorProfile(data);
           })
-          .catch((err) => console.error("Background profile fetch failed:", err))
-          .finally(() => setLoading(false));
+          .catch((err) => console.error("Background profile fetch failed:", err));
       } else {
         setSession(null);
         setDoctorProfile(null);
