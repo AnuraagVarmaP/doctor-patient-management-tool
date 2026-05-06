@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getPatientById } from "../../services/patientService";
-import { getVisitsByPatient, deleteVisit } from "../../services/visitService";
+import { deleteVisit } from "../../services/visitService";
+import { db } from "../../api/firebaseConfig";
+import { doc, collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
 import { useAuth } from "../../context/AuthContext";
 import VisitForm from "../../components/visits/VisitForm";
 import "./PatientDetails.css";
@@ -18,30 +19,53 @@ function PatientDetails() {
   const [isVisitFormOpen, setIsVisitFormOpen] = useState(false);
   const [editingVisit, setEditingVisit] = useState(null);
 
-  const fetchData = React.useCallback(async () => {
-    setIsLoading(true);
-    const doctorId = session?.user?.id;
-    if (doctorId && id) {
-      const [patientRes, visitsRes] = await Promise.all([
-        getPatientById(id, doctorId),
-        getVisitsByPatient(id, doctorId)
-      ]);
-
-      if (patientRes.error) {
-        console.error("Error fetching patient:", patientRes.error);
-        alert("Patient not found or access denied.");
-        navigate("/patients");
-      } else {
-        setPatient(patientRes.data);
-        setVisits(visitsRes.data || []);
-      }
-    }
-    setIsLoading(false);
-  }, [id, session, navigate]);
-
+  /* ── ⚡ REAL-TIME LISTENERS ⚡ ── */
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    const doctorId = session?.user?.id;
+    if (!doctorId || !id) return;
+
+    setIsLoading(true);
+
+    // 1. Listen to Patient Data
+    const patientRef = doc(db, "patients", id);
+    const unsubPatient = onSnapshot(patientRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.doctor_id === doctorId) {
+          setPatient({ id: docSnap.id, ...data });
+        } else {
+          console.error("Access denied to patient");
+          navigate("/patients");
+        }
+      } else {
+        console.error("Patient not found");
+        navigate("/patients");
+      }
+      setIsLoading(false);
+    });
+
+    // 2. Listen to Visits
+    const visitsRef = collection(db, "visits");
+    const q = query(
+      visitsRef,
+      where("patient_id", "==", id),
+      where("doctor_id", "==", doctorId),
+      orderBy("visit_date", "desc")
+    );
+
+    const unsubVisits = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setVisits(data);
+    });
+
+    return () => {
+      unsubPatient();
+      unsubVisits();
+    };
+  }, [id, session, navigate]);
 
   const handleDeleteVisit = async (visitId) => {
     if (window.confirm("Are you sure you want to delete this visit record?")) {
@@ -49,16 +73,15 @@ function PatientDetails() {
       const { error } = await deleteVisit(visitId, doctorId);
       if (error) {
         alert(error.message);
-      } else {
-        fetchData();
       }
+      // No need to fetchData() anymore, onSnapshot handles it!
     }
   };
 
   const handleSaveVisit = (savedVisit) => {
     setIsVisitFormOpen(false);
     setEditingVisit(null);
-    fetchData();
+    // No need to fetchData() anymore!
   };
 
   const openEditVisitForm = (visit) => {
@@ -82,7 +105,7 @@ function PatientDetails() {
         <p><strong>Age:</strong> {patient.age || "N/A"}</p>
         <p><strong>Gender:</strong> {patient.gender || "N/A"}</p>
         <p><strong>Contact Info:</strong> {patient.contact_info || "N/A"}</p>
-        <p><strong>Added On:</strong> {new Date(patient.created_at).toLocaleDateString()}</p>
+        <p><strong>Added On:</strong> {patient.created_at ? new Date(patient.created_at?.toDate?.() || patient.created_at).toLocaleDateString() : "N/A"}</p>
       </div>
 
       <div className="visits-section">

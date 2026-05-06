@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getPatients } from "../../services/patientService";
+import { db } from "../../api/firebaseConfig";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { useAuth } from "../../context/AuthContext";
 import "./Dashboard.css";
 
@@ -10,20 +11,27 @@ function Dashboard() {
   const [patientCount, setPatientCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
+  /* ── ⚡ REAL-TIME DASHBOARD STATS ⚡ ── */
   useEffect(() => {
-    const fetchStats = async () => {
-      setIsLoading(true);
-      const doctorId = session?.user?.id;
-      if (doctorId) {
-        const { data, error } = await getPatients(doctorId);
-        if (!error && data) {
-          setPatientCount(data.length);
-        }
-      }
+    const doctorId = session?.user?.id;
+    if (!doctorId) {
       setIsLoading(false);
-    };
+      return;
+    }
 
-    fetchStats();
+    setIsLoading(true);
+    const patientsRef = collection(db, "patients");
+    const q = query(patientsRef, where("doctor_id", "==", doctorId));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setPatientCount(snapshot.size); // snapshot.size gives the count directly
+      setIsLoading(false);
+    }, (error) => {
+      console.error("Dashboard stats listener error:", error);
+      setIsLoading(false);
+    });
+
+    return () => unsubscribe();
   }, [session]);
 
   const doctorEmail = session?.user?.email;
