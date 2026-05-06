@@ -5,9 +5,9 @@ import {
   useState,
 } from "react";
 
-import { auth, db } from "../api/firebaseConfig";
+import { auth } from "../api/firebaseConfig";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { doc, onSnapshot } from "firebase/firestore";
+import { getDoctorProfile } from "../services/doctorService";
 
 const AuthContext = createContext();
 
@@ -22,11 +22,9 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }, 2000);
 
-    let unsubProfile = () => {};
-
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       clearTimeout(safetyTimeout);
-      
+
       if (user) {
         const normalizedSession = {
           user: {
@@ -35,31 +33,24 @@ export const AuthProvider = ({ children }) => {
           }
         };
         setSession(normalizedSession);
-        // 🔥 REAL-TIME PROFILE LISTENER
-        const profileRef = doc(db, "doctors", user.uid);
-        unsubProfile = onSnapshot(profileRef, (docSnap) => {
-          if (docSnap.exists()) {
-            setDoctorProfile({ id: docSnap.id, ...docSnap.data() });
-          } else {
-            setDoctorProfile(null);
-          }
-          // Only stop loading once we have at least tried to get the profile
-          setLoading(false);
-        }, (err) => {
-          console.error("Profile sync error:", err);
-          setLoading(false);
-        });
+
+        setLoading(false);
+
+        // Fetch profile silently in the background
+        getDoctorProfile(user.uid)
+          .then(({ data }) => {
+            if (data) setDoctorProfile(data);
+          })
+          .catch((err) => console.error("Background profile fetch failed:", err));
       } else {
         setSession(null);
         setDoctorProfile(null);
         setLoading(false);
-        unsubProfile();
       }
     });
 
     return () => {
       unsubscribe();
-      unsubProfile();
       clearTimeout(safetyTimeout);
     };
   }, []);
@@ -92,9 +83,14 @@ export const AuthProvider = ({ children }) => {
   }, [session]);
 
   const refreshProfile = async () => {
-    // Redundant now that we have a real-time onSnapshot listener!
-    // Keeping the function signature to avoid breaking components like Register.jsx
-    return Promise.resolve();
+    if (session?.user?.id) {
+      try {
+        const { data } = await getDoctorProfile(session.user.id);
+        setDoctorProfile(data || null);
+      } catch (err) {
+        console.error("Refresh profile failed:", err);
+      }
+    }
   };
 
   if (loading) {

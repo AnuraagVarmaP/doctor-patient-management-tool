@@ -5,9 +5,11 @@ import "./Auth.css";
 
 import { registerUser } from "../../services/authService";
 import { upsertDoctorProfile } from "../../services/doctorService";
+import { useAuth } from "../../context/AuthContext";
 
 function Register() {
   const navigate = useNavigate();
+  const { refreshProfile } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,8 +22,11 @@ function Register() {
     e.preventDefault();
     if (!email || !password || !name) return;
 
-    // 1. Register the user account
-    const { data: authData, error: authError } = await registerUser(email, password);
+    setIsLoading(true);
+    const { data: authData, error: authError } = await registerUser(
+      email,
+      password
+    );
 
     if (authError) {
       alert(authError.message);
@@ -29,34 +34,26 @@ function Register() {
       return;
     }
 
-    // 2. Create the doctor profile immediately
+    // Immediately create the doctor profile using the new user ID
     if (authData?.user?.id) {
       const profileData = {
         id: authData.user.id,
-        name: name.trim(),
-        designation: designation.trim(),
-        contact_number: contactNumber.trim(),
+        name: name,
+        designation: designation,
+        contact_number: contactNumber,
         updated_at: new Date(),
       };
 
-      try {
-        const { error: profileError } = await upsertDoctorProfile(profileData);
-        if (profileError) {
-          throw profileError;
-        }
-        
-        // 3. Success! Now move to dashboard
-        setIsLoading(false);
-        navigate("/dashboard");
-      } catch (err) {
-        console.error("Profile creation failed:", err);
-        alert("Account created, but profile setup failed. Please try again or contact support.");
-        setIsLoading(false);
+      const { error: profileError } = await upsertDoctorProfile(profileData);
+      if (profileError) {
+        console.error("Error creating profile during registration:", profileError);
+      } else {
+        await refreshProfile();
       }
-    } else {
-      setIsLoading(false);
-      navigate("/dashboard");
     }
+
+    setIsLoading(false);
+    navigate("/dashboard");
   };
 
   return (
