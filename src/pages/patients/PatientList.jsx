@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { getPatients, deletePatient } from "../../services/patientService";
+import { deletePatient } from "../../services/patientService";
+import { db } from "../../api/firebaseConfig";
+import { collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
 import { useAuth } from "../../context/AuthContext";
 import PatientForm from "../../components/patients/PatientForm";
 import "./PatientList.css";
@@ -28,6 +30,42 @@ function PatientList() {
   const [showRecent, setShowRecent] = useState(false);
   const searchRef = useRef(null);
 
+  /* ── ⚡ REAL-TIME LISTENER: The "Firebase Way" ⚡ ── */
+  useEffect(() => {
+    const doctorId = session?.user?.id;
+    if (!doctorId) {
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    const patientsRef = collection(db, "patients");
+    const q = query(
+      patientsRef,
+      where("doctor_id", "==", doctorId),
+      orderBy("created_at", "desc")
+    );
+
+    // This listener will trigger automatically whenever a patient is added, edited, or deleted
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        // Handle potential delay in server timestamps
+        created_at: doc.data().created_at?.toDate?.() || doc.data().created_at || new Date()
+      }));
+      setPatients(data);
+      setIsLoading(false);
+    }, (error) => {
+      console.error("Real-time listener error:", error);
+      setIsLoading(false);
+      // Note: If you see an "Index required" error in the console, 
+      // click the link provided there to create it.
+    });
+
+    return () => unsubscribe();
+  }, [session]);
+
   /* ── close recent panel on outside click ── */
   useEffect(() => {
     const handler = (e) => {
@@ -38,29 +76,6 @@ function PatientList() {
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
-
-  const fetchPatients = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const doctorId = session?.user?.id;
-      if (doctorId) {
-        const { data, error } = await getPatients(doctorId);
-        if (error) {
-          console.error("Error fetching patients:", error);
-        } else {
-          setPatients(data || []);
-        }
-      }
-    } catch (err) {
-      console.error("Unexpected error fetching patients:", err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [session]);
-
-  useEffect(() => {
-    fetchPatients();
-  }, [fetchPatients]);
 
   const commitSearch = (term) => {
     const trimmed = term.trim();
@@ -96,16 +111,15 @@ function PatientList() {
       const { error } = await deletePatient(patientId, doctorId);
       if (error) {
         alert(error.message);
-      } else {
-        fetchPatients();
       }
+      // Note: No need to call fetchPatients here! onSnapshot handles it.
     }
   };
 
   const handleSavePatient = () => {
     setIsFormOpen(false);
     setEditingPatient(null);
-    fetchPatients();
+    // Note: No need to call fetchPatients here! onSnapshot handles it.
   };
 
   const openEditForm = (patient) => {
