@@ -58,16 +58,20 @@ function PatientDetails() {
     const q = query(
       visitsRef,
       where("patient_id", "==", id),
-      where("doctor_id", "==", doctorId),
-      orderBy("visit_date", "desc")
+      where("doctor_id", "==", doctorId)
+      // orderBy removed temporarily to ensure instant real-time updates without index delays
     );
 
     const unsubVisits = onSnapshot(q, (snapshot) => {
+      console.log("Visits update received! Count:", snapshot.size);
       const data = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
-      setVisits(data);
+      
+      // Sort manually by date
+      const sortedVisits = data.sort((a, b) => new Date(b.visit_date) - new Date(a.visit_date));
+      setVisits(sortedVisits);
       setIsInitialLoading(false);
       setIsSyncing(false);
     }, (error) => {

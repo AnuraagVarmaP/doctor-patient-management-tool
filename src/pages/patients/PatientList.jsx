@@ -42,19 +42,26 @@ function PatientList() {
     const patientsRef = collection(db, "patients");
     const q = query(
       patientsRef,
-      where("doctor_id", "==", doctorId),
-      orderBy("created_at", "desc")
+      where("doctor_id", "==", doctorId)
+      // orderBy removed temporarily to fix the "Missing Index" issue that blocks real-time updates
     );
 
-    // This listener will trigger automatically whenever a patient is added, edited, or deleted
     const unsubscribe = onSnapshot(q, (snapshot) => {
+      console.log("Real-time update received! Docs count:", snapshot.size);
       const data = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
-        // Handle potential delay in server timestamps
         created_at: doc.data().created_at?.toDate?.() || doc.data().created_at || new Date()
       }));
-      setPatients(data);
+      
+      // Sort manually in memory to avoid the index requirement for now
+      const sortedData = data.sort((a, b) => {
+        const dateA = a.created_at instanceof Date ? a.created_at : new Date(a.created_at);
+        const dateB = b.created_at instanceof Date ? b.created_at : new Date(b.created_at);
+        return dateB - dateA;
+      });
+
+      setPatients(sortedData);
       setIsLoading(false);
     }, (error) => {
       console.error("Real-time listener error:", error);
