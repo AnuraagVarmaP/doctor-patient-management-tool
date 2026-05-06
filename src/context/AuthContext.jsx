@@ -17,9 +17,15 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Safety timeout: if auth takes more than 5s, stop loading anyway
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      clearTimeout(safetyTimeout);
+      
       if (user) {
-        // Normalize Firebase user to match the app's expected session structure
         const normalizedSession = {
           user: {
             id: user.uid,
@@ -28,21 +34,24 @@ export const AuthProvider = ({ children }) => {
         };
         setSession(normalizedSession);
 
-        try {
-          const { data } = await getDoctorProfile(user.uid);
-          setDoctorProfile(data || null);
-        } catch (profileError) {
-          console.error("Failed to fetch doctor profile:", profileError);
-          setDoctorProfile(null);
-        }
+        // Fetch profile in the background so it doesn't block the app from appearing
+        getDoctorProfile(user.uid)
+          .then(({ data }) => {
+            if (data) setDoctorProfile(data);
+          })
+          .catch((err) => console.error("Background profile fetch failed:", err))
+          .finally(() => setLoading(false));
       } else {
         setSession(null);
         setDoctorProfile(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      clearTimeout(safetyTimeout);
+    };
   }, []);
 
   // 30-minute inactivity session timeout

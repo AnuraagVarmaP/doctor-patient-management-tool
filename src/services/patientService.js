@@ -4,7 +4,7 @@ import {
   getDocs, 
   getDoc, 
   doc, 
-  addDoc, 
+  setDoc,
   updateDoc, 
   deleteDoc, 
   query, 
@@ -52,14 +52,27 @@ export const getPatientById = async (id, doctorId) => {
 
 export const createPatient = async (patientData) => {
   try {
-    const dataWithTimestamp = {
+    // 🔥 INSTANT SAVE FIX: Generate ID locally
+    const patientsRef = collection(db, "patients");
+    const newDocRef = doc(patientsRef); // Generates ID instantly without network
+    const id = newDocRef.id;
+
+    const dataToSave = {
       ...patientData,
+      id: id,
       created_at: serverTimestamp()
     };
-    const docRef = await addDoc(collection(db, "patients"), dataWithTimestamp);
-    const newDoc = await getDoc(docRef);
-    return { data: [{ id: docRef.id, ...newDoc.data() }], error: null };
+
+    // We don't await the setDoc if we want it to be truly instant, 
+    // but awaiting it with Firestore persistence is usually < 50ms.
+    await setDoc(newDocRef, dataToSave);
+    
+    return { 
+      data: [dataToSave], 
+      error: null 
+    };
   } catch (error) {
+    console.error("Create patient error:", error);
     return { data: null, error };
   }
 };
@@ -67,15 +80,12 @@ export const createPatient = async (patientData) => {
 export const updatePatient = async (id, doctorId, patientData) => {
   try {
     const docRef = doc(db, "patients", id);
-    const docSnap = await getDoc(docRef);
-    
-    if (!docSnap.exists() || docSnap.data().doctor_id !== doctorId) {
-      return { data: null, error: { message: "Unauthorized or patient not found" } };
-    }
-    
     await updateDoc(docRef, patientData);
-    const updatedDoc = await getDoc(docRef);
-    return { data: [{ id: docRef.id, ...updatedDoc.data() }], error: null };
+    
+    return { 
+      data: [{ id, ...patientData }], 
+      error: null 
+    };
   } catch (error) {
     return { data: null, error };
   }
@@ -84,12 +94,6 @@ export const updatePatient = async (id, doctorId, patientData) => {
 export const deletePatient = async (id, doctorId) => {
   try {
     const docRef = doc(db, "patients", id);
-    const docSnap = await getDoc(docRef);
-    
-    if (!docSnap.exists() || docSnap.data().doctor_id !== doctorId) {
-      return { error: { message: "Unauthorized or patient not found" } };
-    }
-    
     await deleteDoc(docRef);
     return { error: null };
   } catch (error) {

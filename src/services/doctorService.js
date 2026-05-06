@@ -22,12 +22,13 @@ export const upsertDoctorProfile = async (profileData) => {
     const { id, ...data } = profileData;
     const docRef = doc(db, "doctors", id);
     
-    // Check if it exists to decide between setDoc (new) or updateDoc (existing)
-    // Actually setDoc with merge: true acts like an upsert
+    // Optimization: setDoc is fast, return data locally instead of re-fetching
     await setDoc(docRef, data, { merge: true });
     
-    const updatedSnap = await getDoc(docRef);
-    return { data: { id: updatedSnap.id, ...updatedSnap.data() }, error: null };
+    return { 
+      data: { id, ...data }, 
+      error: null 
+    };
   } catch (error) {
     console.error("upsertDoctorProfile thrown error:", error);
     return { data: null, error };

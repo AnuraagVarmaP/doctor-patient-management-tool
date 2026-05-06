@@ -4,7 +4,7 @@ import {
   getDocs, 
   getDoc, 
   doc, 
-  addDoc, 
+  setDoc,
   updateDoc, 
   deleteDoc, 
   query, 
@@ -38,14 +38,25 @@ export const getVisitsByPatient = async (patientId, doctorId) => {
 
 export const createVisit = async (visitData) => {
   try {
-    const dataWithTimestamp = {
+    // 🔥 INSTANT SAVE FIX: Generate ID locally
+    const visitsRef = collection(db, "visits");
+    const newDocRef = doc(visitsRef);
+    const id = newDocRef.id;
+
+    const dataToSave = {
       ...visitData,
+      id: id,
       created_at: serverTimestamp()
     };
-    const docRef = await addDoc(collection(db, "visits"), dataWithTimestamp);
-    const newDoc = await getDoc(docRef);
-    return { data: [{ id: docRef.id, ...newDoc.data() }], error: null };
+
+    await setDoc(newDocRef, dataToSave);
+    
+    return { 
+      data: [dataToSave], 
+      error: null 
+    };
   } catch (error) {
+    console.error("Create visit error:", error);
     return { data: null, error };
   }
 };
@@ -53,15 +64,12 @@ export const createVisit = async (visitData) => {
 export const updateVisit = async (id, doctorId, visitData) => {
   try {
     const docRef = doc(db, "visits", id);
-    const docSnap = await getDoc(docRef);
-    
-    if (!docSnap.exists() || docSnap.data().doctor_id !== doctorId) {
-      return { data: null, error: { message: "Unauthorized or visit not found" } };
-    }
-    
     await updateDoc(docRef, visitData);
-    const updatedDoc = await getDoc(docRef);
-    return { data: [{ id: docRef.id, ...updatedDoc.data() }], error: null };
+    
+    return { 
+      data: [{ id, ...visitData }], 
+      error: null 
+    };
   } catch (error) {
     return { data: null, error };
   }
@@ -70,12 +78,6 @@ export const updateVisit = async (id, doctorId, visitData) => {
 export const deleteVisit = async (id, doctorId) => {
   try {
     const docRef = doc(db, "visits", id);
-    const docSnap = await getDoc(docRef);
-    
-    if (!docSnap.exists() || docSnap.data().doctor_id !== doctorId) {
-      return { error: { message: "Unauthorized or visit not found" } };
-    }
-    
     await deleteDoc(docRef);
     return { error: null };
   } catch (error) {
