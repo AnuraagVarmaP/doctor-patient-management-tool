@@ -35,8 +35,6 @@ export const AuthProvider = ({ children }) => {
           }
         };
         setSession(normalizedSession);
-        setLoading(false);
-
         // 🔥 REAL-TIME PROFILE LISTENER
         const profileRef = doc(db, "doctors", user.uid);
         unsubProfile = onSnapshot(profileRef, (docSnap) => {
@@ -45,6 +43,11 @@ export const AuthProvider = ({ children }) => {
           } else {
             setDoctorProfile(null);
           }
+          // Only stop loading once we have at least tried to get the profile
+          setLoading(false);
+        }, (err) => {
+          console.error("Profile sync error:", err);
+          setLoading(false);
         });
       } else {
         setSession(null);

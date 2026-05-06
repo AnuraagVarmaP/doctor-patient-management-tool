@@ -22,11 +22,8 @@ function Register() {
     e.preventDefault();
     if (!email || !password || !name) return;
 
-    setIsLoading(true);
-    const { data: authData, error: authError } = await registerUser(
-      email,
-      password
-    );
+    // 1. Register the user account
+    const { data: authData, error: authError } = await registerUser(email, password);
 
     if (authError) {
       alert(authError.message);
@@ -34,26 +31,34 @@ function Register() {
       return;
     }
 
-    // Immediately create the doctor profile using the new user ID
+    // 2. Create the doctor profile immediately
     if (authData?.user?.id) {
       const profileData = {
         id: authData.user.id,
-        name: name,
-        designation: designation,
-        contact_number: contactNumber,
+        name: name.trim(),
+        designation: designation.trim(),
+        contact_number: contactNumber.trim(),
         updated_at: new Date(),
       };
 
-      const { error: profileError } = await upsertDoctorProfile(profileData);
-      if (profileError) {
-        console.error("Error creating profile during registration:", profileError);
-      } else {
-        await refreshProfile();
+      try {
+        const { error: profileError } = await upsertDoctorProfile(profileData);
+        if (profileError) {
+          throw profileError;
+        }
+        
+        // 3. Success! Now move to dashboard
+        setIsLoading(false);
+        navigate("/dashboard");
+      } catch (err) {
+        console.error("Profile creation failed:", err);
+        alert("Account created, but profile setup failed. Please try again or contact support.");
+        setIsLoading(false);
       }
+    } else {
+      setIsLoading(false);
+      navigate("/dashboard");
     }
-
-    setIsLoading(false);
-    navigate("/dashboard");
   };
 
   return (

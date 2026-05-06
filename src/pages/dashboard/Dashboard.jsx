@@ -11,7 +11,6 @@ function Dashboard() {
   const [patientCount, setPatientCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
-  /* ── ⚡ REAL-TIME DASHBOARD STATS ⚡ ── */
   useEffect(() => {
     const doctorId = session?.user?.id;
     if (!doctorId) {
@@ -24,7 +23,7 @@ function Dashboard() {
     const q = query(patientsRef, where("doctor_id", "==", doctorId));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      setPatientCount(snapshot.size); // snapshot.size gives the count directly
+      setPatientCount(snapshot.size);
       setIsLoading(false);
     }, (error) => {
       console.error("Dashboard stats listener error:", error);
