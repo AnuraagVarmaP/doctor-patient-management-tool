@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { getPatients, deletePatient } from "../../services/patientService";
 import { useAuth } from "../../context/AuthContext";
 import PatientForm from "../../components/patients/PatientForm";
@@ -13,11 +13,7 @@ function PatientList() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingPatient, setEditingPatient] = useState(null);
 
-  useEffect(() => {
-    fetchPatients();
-  }, [session]);
-
-  const fetchPatients = async () => {
+  const fetchPatients = useCallback(async () => {
     setIsLoading(true);
     const doctorId = session?.user?.id;
     if (doctorId) {
@@ -29,7 +25,11 @@ function PatientList() {
       }
     }
     setIsLoading(false);
-  };
+  }, [session]);
+
+  useEffect(() => {
+    fetchPatients();
+  }, [fetchPatients]);
 
   const handleDelete = async (patientId) => {
     if (window.confirm("Are you sure you want to delete this patient and all their records?")) {
