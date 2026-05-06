@@ -5,7 +5,8 @@ import {
   useState,
 } from "react";
 
-import { supabase } from "../api/supabaseClient";
+import { auth } from "../api/firebaseConfig";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { getDoctorProfile } from "../services/doctorService";
 
 const AuthContext = createContext();
@@ -16,56 +17,32 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchSessionAndProfile = async () => {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        setSession(session);
-
-        if (session?.user?.id) {
-          try {
-            const { data } = await getDoctorProfile(session.user.id);
-            setDoctorProfile(data || null);
-          } catch (profileError) {
-            console.error("Failed to fetch doctor profile:", profileError);
-            setDoctorProfile(null);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Normalize Firebase user to match the app's expected session structure
+        const normalizedSession = {
+          user: {
+            id: user.uid,
+            email: user.email,
           }
-        } else {
+        };
+        setSession(normalizedSession);
+
+        try {
+          const { data } = await getDoctorProfile(user.uid);
+          setDoctorProfile(data || null);
+        } catch (profileError) {
+          console.error("Failed to fetch doctor profile:", profileError);
           setDoctorProfile(null);
         }
-      } catch (sessionError) {
-        console.error("Failed to fetch session:", sessionError);
-      } finally {
-        setLoading(false);
+      } else {
+        setSession(null);
+        setDoctorProfile(null);
       }
-    };
+      setLoading(false);
+    });
 
-    fetchSessionAndProfile();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        if (session?.user?.id) {
-          try {
-            const { data } = await getDoctorProfile(session.user.id);
-            setDoctorProfile(data || null);
-          } catch (err) {
-            console.error("Failed on auth change profile fetch:", err);
-            setDoctorProfile(null);
-          }
-        } else {
-          setDoctorProfile(null);
-        }
-      }
-    );
-
-    return () => {
-      subscription.unsubscribe();
-    };
+    return () => unsubscribe();
   }, []);
 
   // 30-minute inactivity session timeout
@@ -75,7 +52,7 @@ export const AuthProvider = ({ children }) => {
       clearTimeout(timeoutId);
       if (session) {
         timeoutId = setTimeout(() => {
-          supabase.auth.signOut();
+          signOut(auth);
         }, 30 * 60 * 1000); // 30 minutes
       }
     };

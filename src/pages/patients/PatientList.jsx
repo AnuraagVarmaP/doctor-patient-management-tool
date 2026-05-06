@@ -1,9 +1,13 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { getPatients, deletePatient } from "../../services/patientService";
 import { useAuth } from "../../context/AuthContext";
 import PatientForm from "../../components/patients/PatientForm";
 import "./PatientList.css";
+
+const RECENT_KEY = "patient_recent_searches";
+const MAX_RECENT = 5;
+const GENDER_TAGS = ["All", "Male", "Female", "Other"];
 
 function PatientList() {
   const { session } = useAuth();
@@ -12,24 +16,79 @@ function PatientList() {
   const [isLoading, setIsLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingPatient, setEditingPatient] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [genderFilter, setGenderFilter] = useState("All");
+  const [recentSearches, setRecentSearches] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(RECENT_KEY)) || [];
+    } catch {
+      return [];
+    }
+  });
+  const [showRecent, setShowRecent] = useState(false);
+  const searchRef = useRef(null);
+
+  /* ── close recent panel on outside click ── */
+  useEffect(() => {
+    const handler = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setShowRecent(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const fetchPatients = useCallback(async () => {
     setIsLoading(true);
-    const doctorId = session?.user?.id;
-    if (doctorId) {
-      const { data, error } = await getPatients(doctorId);
-      if (error) {
-        console.error("Error fetching patients:", error);
-      } else {
-        setPatients(data || []);
+    try {
+      const doctorId = session?.user?.id;
+      if (doctorId) {
+        const { data, error } = await getPatients(doctorId);
+        if (error) {
+          console.error("Error fetching patients:", error);
+        } else {
+          setPatients(data || []);
+        }
       }
+    } catch (err) {
+      console.error("Unexpected error fetching patients:", err);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, [session]);
 
   useEffect(() => {
     fetchPatients();
   }, [fetchPatients]);
+
+  const commitSearch = (term) => {
+    const trimmed = term.trim();
+    if (!trimmed) return;
+    setRecentSearches((prev) => {
+      const updated = [trimmed, ...prev.filter((r) => r !== trimmed)].slice(0, MAX_RECENT);
+      localStorage.setItem(RECENT_KEY, JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const handleSearchKeyDown = (e) => {
+    if (e.key === "Enter") {
+      commitSearch(searchQuery);
+      setShowRecent(false);
+    }
+    if (e.key === "Escape") setShowRecent(false);
+  };
+
+  const applyRecent = (term) => {
+    setSearchQuery(term);
+    setShowRecent(false);
+  };
+
+  const clearRecent = () => {
+    setRecentSearches([]);
+    localStorage.removeItem(RECENT_KEY);
+  };
 
   const handleDelete = async (patientId) => {
     if (window.confirm("Are you sure you want to delete this patient and all their records?")) {
@@ -43,7 +102,7 @@ function PatientList() {
     }
   };
 
-  const handleSavePatient = (savedPatient) => {
+  const handleSavePatient = () => {
     setIsFormOpen(false);
     setEditingPatient(null);
     fetchPatients();
@@ -54,8 +113,18 @@ function PatientList() {
     setIsFormOpen(true);
   };
 
+  /* ── filter logic ── */
+  const filteredPatients = patients.filter((p) => {
+    const matchesName = p.name?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesGender =
+      genderFilter === "All" ||
+      (p.gender || "").toLowerCase() === genderFilter.toLowerCase();
+    return matchesName && matchesGender;
+  });
+
   return (
     <div className="patient-list-container">
+      {/* ── Page header ── */}
       <div className="patient-header">
         <h1>My Patients</h1>
         <button className="btn-primary" onClick={() => setIsFormOpen(true)}>
@@ -63,15 +132,94 @@ function PatientList() {
         </button>
       </div>
 
+      {/* ── Search panel ── */}
+      <div className="search-panel">
+        <div className="search-panel-inner">
+          <h4 className="search-panel-title">Find a Patient</h4>
+
+          {/* Input row */}
+          <div className="search-input-wrap" ref={searchRef}>
+            <span className="si-icon">&#128269;</span>
+            <input
+              id="patient-search-input"
+              type="text"
+              className="si-input"
+              placeholder="Search by patient name…"
+              value={searchQuery}
+              autoComplete="off"
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setShowRecent(true);
+              }}
+              onFocus={() => setShowRecent(true)}
+              onKeyDown={handleSearchKeyDown}
+              onBlur={() => setTimeout(() => setShowRecent(false), 150)}
+            />
+            {searchQuery && (
+              <button
+                className="si-clear"
+                onClick={() => { setSearchQuery(""); setShowRecent(false); }}
+                aria-label="Clear search"
+              >
+                &#10005;
+              </button>
+            )}
+
+            {/* Recent dropdown */}
+            {showRecent && recentSearches.length > 0 && (
+              <div className="recent-dropdown">
+                <div className="recent-dropdown-header">
+                  <span>Recent Searches</span>
+                  <button className="recent-clear-all" onClick={clearRecent}>
+                    Clear all
+                  </button>
+                </div>
+                {recentSearches.map((term) => (
+                  <div
+                    key={term}
+                    className="recent-item"
+                    onMouseDown={() => applyRecent(term)}
+                  >
+                    <span className="recent-clock">&#128337;</span>
+                    {term}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Gender tag pills */}
+          <div className="search-tags">
+            {GENDER_TAGS.map((tag) => (
+              <button
+                key={tag}
+                className={`tag${genderFilter === tag ? " tag--active" : ""}`}
+                onClick={() => setGenderFilter(tag)}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Results ── */}
       {isLoading ? (
-        <p>Loading patients...</p>
+        <p className="loading-text">Loading patients…</p>
       ) : patients.length === 0 ? (
         <div className="no-patients">
           <p>No patients found. Add your first patient to get started.</p>
         </div>
+      ) : filteredPatients.length === 0 ? (
+        <div className="no-patients">
+          <p>
+            No patients match&nbsp;<strong>&ldquo;{searchQuery}&rdquo;</strong>
+            {genderFilter !== "All" && <> with gender <strong>{genderFilter}</strong></>}.
+          </p>
+        </div>
       ) : (
         <div className="patient-grid">
-          {patients.map((patient) => (
+          {filteredPatients.map((patient) => (
             <div key={patient.id} className="patient-card">
               <h3>{patient.name}</h3>
               <div className="patient-info">

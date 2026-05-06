@@ -1,38 +1,84 @@
-import { supabase } from "../api/supabaseClient";
+import { db } from "../api/firebaseConfig";
+import { 
+  collection, 
+  getDocs, 
+  getDoc, 
+  doc, 
+  addDoc, 
+  updateDoc, 
+  deleteDoc, 
+  query, 
+  where, 
+  orderBy,
+  serverTimestamp 
+} from "firebase/firestore";
 
 export const getVisitsByPatient = async (patientId, doctorId) => {
-  const { data, error } = await supabase
-    .from("visits")
-    .select("*")
-    .eq("patient_id", patientId)
-    .eq("doctor_id", doctorId)
-    .order("visit_date", { ascending: false });
-  return { data, error };
+  try {
+    const visitsRef = collection(db, "visits");
+    const q = query(
+      visitsRef, 
+      where("patient_id", "==", patientId),
+      where("doctor_id", "==", doctorId),
+      orderBy("visit_date", "desc")
+    );
+    
+    const querySnapshot = await getDocs(q);
+    const data = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    
+    return { data, error: null };
+  } catch (error) {
+    console.error("Error fetching visits:", error);
+    return { data: null, error };
+  }
 };
 
 export const createVisit = async (visitData) => {
-  const { data, error } = await supabase
-    .from("visits")
-    .insert([visitData])
-    .select();
-  return { data, error };
+  try {
+    const dataWithTimestamp = {
+      ...visitData,
+      created_at: serverTimestamp()
+    };
+    const docRef = await addDoc(collection(db, "visits"), dataWithTimestamp);
+    const newDoc = await getDoc(docRef);
+    return { data: [{ id: docRef.id, ...newDoc.data() }], error: null };
+  } catch (error) {
+    return { data: null, error };
+  }
 };
 
 export const updateVisit = async (id, doctorId, visitData) => {
-  const { data, error } = await supabase
-    .from("visits")
-    .update(visitData)
-    .eq("id", id)
-    .eq("doctor_id", doctorId)
-    .select();
-  return { data, error };
+  try {
+    const docRef = doc(db, "visits", id);
+    const docSnap = await getDoc(docRef);
+    
+    if (!docSnap.exists() || docSnap.data().doctor_id !== doctorId) {
+      return { data: null, error: { message: "Unauthorized or visit not found" } };
+    }
+    
+    await updateDoc(docRef, visitData);
+    const updatedDoc = await getDoc(docRef);
+    return { data: [{ id: docRef.id, ...updatedDoc.data() }], error: null };
+  } catch (error) {
+    return { data: null, error };
+  }
 };
 
 export const deleteVisit = async (id, doctorId) => {
-  const { error } = await supabase
-    .from("visits")
-    .delete()
-    .eq("id", id)
-    .eq("doctor_id", doctorId);
-  return { error };
+  try {
+    const docRef = doc(db, "visits", id);
+    const docSnap = await getDoc(docRef);
+    
+    if (!docSnap.exists() || docSnap.data().doctor_id !== doctorId) {
+      return { error: { message: "Unauthorized or visit not found" } };
+    }
+    
+    await deleteDoc(docRef);
+    return { error: null };
+  } catch (error) {
+    return { error };
+  }
 };

@@ -1,5 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
+/* ══════════════════════════════════════════
+   Page shell
+══════════════════════════════════════════ */
 .patient-list-container {
   font-family: 'Plus Jakarta Sans', sans-serif;
   padding: 40px 20px;
@@ -9,11 +12,14 @@
   min-height: 100vh;
 }
 
+/* ══════════════════════════════════════════
+   Header
+══════════════════════════════════════════ */
 .patient-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
 }
 
 .patient-header h1 {
@@ -25,6 +31,208 @@
   text-transform: uppercase;
 }
 
+/* ══════════════════════════════════════════
+   Search panel  (reference-inspired redesign)
+══════════════════════════════════════════ */
+.search-panel {
+  background: linear-gradient(135deg, #1a1a1a 0%, #3d3d3d 100%);
+  border-radius: 20px;
+  padding: 2px;            /* acts as gradient border */
+  margin-bottom: 36px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+}
+
+.search-panel-inner {
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(12px);
+  border-radius: 18px;
+  padding: 28px 32px 24px;
+}
+
+.search-panel-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #999;
+  margin: 0 0 18px 0;
+}
+
+/* ── Input row ── */
+.search-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: #f8f8f8;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.search-input-wrap:focus-within {
+  border-color: #000000;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.07);
+  background: #ffffff;
+}
+
+.si-icon {
+  padding: 0 14px;
+  font-size: 17px;
+  color: #aaa;
+  pointer-events: none;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.si-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 16px 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #000;
+  background: transparent;
+}
+
+.si-input::placeholder {
+  color: #bbb;
+  font-weight: 400;
+}
+
+.si-clear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 16px;
+  color: #aaa;
+  font-size: 13px;
+  line-height: 1;
+  transition: color 0.15s ease;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  flex-shrink: 0;
+}
+
+.si-clear:hover {
+  color: #000;
+}
+
+/* ── Recent-searches dropdown ── */
+.recent-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  z-index: 100;
+  overflow: hidden;
+  animation: dropIn 0.18s ease;
+}
+
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.recent-dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: #f8f8f8;
+  border-bottom: 1px solid #ebebeb;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #888;
+}
+
+.recent-clear-all {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0;
+  transition: color 0.15s ease;
+}
+
+.recent-clear-all:hover {
+  color: #d32f2f;
+}
+
+.recent-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+  transition: background 0.15s ease;
+}
+
+.recent-item:hover {
+  background: #f3f4f6;
+}
+
+.recent-clock {
+  font-size: 14px;
+  color: #bbb;
+  flex-shrink: 0;
+}
+
+/* ── Gender tag pills ── */
+.search-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  background: #f3f4f6;
+  border: 1.5px solid transparent;
+  border-radius: 20px;
+  padding: 7px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #555;
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  transition: all 0.2s ease;
+}
+
+.tag:hover {
+  background: #ebebeb;
+  color: #000;
+}
+
+.tag--active {
+  background: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+.tag--active:hover {
+  background: #333;
+}
+
+/* ══════════════════════════════════════════
+   Patient grid & cards
+══════════════════════════════════════════ */
 .patient-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -38,11 +246,12 @@
   padding: 30px;
   display: flex;
   flex-direction: column;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .patient-card:hover {
   border-color: #000000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
 .patient-card h3 {
@@ -61,12 +270,12 @@
 
 .patient-info p {
   margin: 8px 0;
-  color: #666666;
+  color: #666;
   font-size: 15px;
 }
 
 .patient-info strong {
-  color: #000000;
+  color: #000;
   font-weight: 700;
   text-transform: uppercase;
   font-size: 12px;
@@ -93,25 +302,36 @@
   transition: all 0.2s ease;
 }
 
+/* ══════════════════════════════════════════
+   Buttons
+══════════════════════════════════════════ */
 .btn-primary {
-  background-color: #000000;
-  color: #ffffff;
-  border: 1px solid #000000;
+  background-color: #000;
+  color: #fff;
+  border: 1px solid #000;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  padding: 14px 24px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  transition: all 0.2s ease;
 }
 
 .btn-primary:hover {
   background-color: transparent;
-  color: #000000;
+  color: #000;
 }
 
 .btn-secondary {
   background-color: transparent;
-  color: #000000;
+  color: #000;
   border: 1px solid #e0e0e0;
 }
 
 .btn-secondary:hover {
-  border-color: #000000;
+  border-color: #000;
 }
 
 .btn-danger {
@@ -124,12 +344,20 @@
   border-color: #d32f2f;
 }
 
+/* ══════════════════════════════════════════
+   Empty states & loading
+══════════════════════════════════════════ */
 .no-patients {
   text-align: center;
-  color: #666666;
+  color: #666;
   padding: 60px 20px;
-  background: #ffffff;
+  background: #fff;
   border: 1px solid #e0e0e0;
-  border-radius: 0;
   font-size: 16px;
+}
+
+.loading-text {
+  color: #666;
+  font-size: 15px;
+  padding: 20px 0;
 }
