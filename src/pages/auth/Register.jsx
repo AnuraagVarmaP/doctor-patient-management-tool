@@ -5,11 +5,9 @@ import "./Auth.css";
 
 import { registerUser } from "../../services/authService";
 import { upsertDoctorProfile } from "../../services/doctorService";
-import { useAuth } from "../../context/AuthContext";
 
 function Register() {
   const navigate = useNavigate();
-  const { refreshProfile } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
