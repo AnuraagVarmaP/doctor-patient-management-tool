@@ -5,6 +5,7 @@ import { db } from "../../api/firebaseConfig";
 import { doc, collection, query, where, onSnapshot } from "firebase/firestore";
 import { useAuth } from "../../context/AuthContext";
 import VisitForm from "../../components/visits/VisitForm";
+import ConfirmModal from "../../components/common/ConfirmModal/ConfirmModal";
 import "./PatientDetails.css";
 
 function PatientDetails() {
@@ -19,6 +20,7 @@ function PatientDetails() {
 
   const [isVisitFormOpen, setIsVisitFormOpen] = useState(false);
   const [editingVisit, setEditingVisit] = useState(null);
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, visitId: null });
 
   /* ── ⚡ ROBUST REAL-TIME LISTENERS ⚡ ── */
   useEffect(() => {
@@ -90,13 +92,18 @@ function PatientDetails() {
     };
   }, [id, session, navigate]);
 
-  const handleDeleteVisit = async (visitId) => {
-    if (window.confirm("Are you sure you want to delete this visit record?")) {
-      const doctorId = session?.user?.id;
-      const { error } = await deleteVisit(visitId, doctorId);
-      if (error) {
-        alert("Delete failed: " + error.message);
-      }
+  const handleDeleteVisit = (visitId) => {
+    setDeleteModal({ isOpen: true, visitId });
+  };
+
+  const confirmDeleteVisit = async () => {
+    const { visitId } = deleteModal;
+    if (!visitId) return;
+
+    const doctorId = session?.user?.id;
+    const { error } = await deleteVisit(visitId, doctorId);
+    if (error) {
+      alert("Delete failed: " + error.message);
     }
   };
 
@@ -208,6 +215,16 @@ function PatientDetails() {
           }}
         />
       )}
+
+      <ConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, visitId: null })}
+        onConfirm={confirmDeleteVisit}
+        title="Delete Visit"
+        message="Are you sure you want to delete this visit record? This action cannot be undone."
+        confirmText="Delete"
+        type="danger"
+      />
     </div>
   );
 }

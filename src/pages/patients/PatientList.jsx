@@ -5,6 +5,7 @@ import { db } from "../../api/firebaseConfig";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { useAuth } from "../../context/AuthContext";
 import PatientForm from "../../components/patients/PatientForm";
+import ConfirmModal from "../../components/common/ConfirmModal/ConfirmModal";
 import "./PatientList.css";
 
 const RECENT_KEY = "patient_recent_searches";
@@ -28,6 +29,7 @@ function PatientList() {
     }
   });
   const [showRecent, setShowRecent] = useState(false);
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, patientId: null });
   const searchRef = useRef(null);
 
   /* ── ⚡ REAL-TIME LISTENER: The "Firebase Way" ⚡ ── */
@@ -112,14 +114,18 @@ function PatientList() {
     localStorage.removeItem(RECENT_KEY);
   };
 
-  const handleDelete = async (patientId) => {
-    if (window.confirm("Are you sure you want to delete this patient and all their records?")) {
-      const doctorId = session?.user?.id;
-      const { error } = await deletePatient(patientId, doctorId);
-      if (error) {
-        alert(error.message);
-      }
-      // Note: No need to call fetchPatients here! onSnapshot handles it.
+  const handleDelete = (patientId) => {
+    setDeleteModal({ isOpen: true, patientId });
+  };
+
+  const confirmDelete = async () => {
+    const { patientId } = deleteModal;
+    if (!patientId) return;
+
+    const doctorId = session?.user?.id;
+    const { error } = await deletePatient(patientId, doctorId);
+    if (error) {
+      alert(error.message);
     }
   };
 
@@ -274,6 +280,16 @@ function PatientList() {
           }}
         />
       )}
+
+      <ConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, patientId: null })}
+        onConfirm={confirmDelete}
+        title="Delete Patient"
+        message="Are you sure you want to delete this patient and all their records? This action cannot be undone."
+        confirmText="Delete"
+        type="danger"
+      />
     </div>
   );
 }
