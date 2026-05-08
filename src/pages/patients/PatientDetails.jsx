@@ -6,6 +6,7 @@ import { doc, collection, query, where, onSnapshot } from "firebase/firestore";
 import { useAuth } from "../../context/AuthContext";
 import VisitForm from "../../components/visits/VisitForm";
 import ConfirmModal from "../../components/common/ConfirmModal/ConfirmModal";
+import arrowLeftIcon from "../../assets/icons/arrow-left.svg";
 import "./PatientDetails.css";
 
 function PatientDetails() {
@@ -134,7 +135,8 @@ function PatientDetails() {
     <div className="patient-details-container">
       <div className="patient-header">
         <button className="btn-secondary" onClick={() => navigate("/patients")}>
-          &larr; Back to Patients
+          <img src={arrowLeftIcon} alt="back" width="16" height="16" style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+          Back to Patients
         </button>
         {isSyncing && <span className="sync-indicator">Syncing...</span>}
       </div>

@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import './ConfirmModal.css';
+import warningIcon from '../../../assets/icons/warning.svg';
+import infoIcon from '../../../assets/icons/info.svg';
 
 const ConfirmModal = ({ 
   isOpen, 
@@ -28,7 +30,16 @@ const ConfirmModal = ({
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-handle"></div>
         <div className="modal-content">
+          <div className={`modal-icon-container ${type}`}>
+            <img 
+              src={type === 'danger' ? warningIcon : infoIcon} 
+              alt={type} 
+              width="48" 
+              height="48" 
+            />
+          </div>
           <h3 className="modal-title">{title}</h3>
           <p className="modal-message">{message}</p>
         </div>

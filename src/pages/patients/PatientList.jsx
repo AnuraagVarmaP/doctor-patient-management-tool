@@ -6,6 +6,9 @@ import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { useAuth } from "../../context/AuthContext";
 import PatientForm from "../../components/patients/PatientForm";
 import ConfirmModal from "../../components/common/ConfirmModal/ConfirmModal";
+import searchIcon from "../../assets/icons/search.svg";
+import closeIcon from "../../assets/icons/close.svg";
+import clockIcon from "../../assets/icons/clock.svg";
 import "./PatientList.css";
 
 const RECENT_KEY = "patient_recent_searches";
@@ -166,7 +169,9 @@ function PatientList() {
 
           {/* Input row */}
           <div className="search-input-wrap" ref={searchRef}>
-            <span className="si-icon">&#128269;</span>
+            <span className="si-icon">
+              <img src={searchIcon} alt="search" width="18" height="18" />
+            </span>
             <input
               id="patient-search-input"
               type="text"
@@ -188,7 +193,7 @@ function PatientList() {
                 onClick={() => { setSearchQuery(""); setShowRecent(false); }}
                 aria-label="Clear search"
               >
-                &#10005;
+                <img src={closeIcon} alt="clear" width="14" height="14" />
               </button>
             )}
 
@@ -207,7 +212,9 @@ function PatientList() {
                     className="recent-item"
                     onMouseDown={() => applyRecent(term)}
                   >
-                    <span className="recent-clock">&#128337;</span>
+                    <span className="recent-clock">
+                      <img src={clockIcon} alt="recent" width="14" height="14" />
+                    </span>
                     {term}
                   </div>
                 ))}

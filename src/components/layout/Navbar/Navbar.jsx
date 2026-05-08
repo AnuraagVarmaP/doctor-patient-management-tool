@@ -5,6 +5,8 @@ import "./Navbar.css";
 
 import { logoutUser } from "../../../services/authService";
 import { useAuth } from "../../../context/AuthContext";
+import userIcon from "../../../assets/icons/user.svg";
+import menuIcon from "../../../assets/icons/menu.svg";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -58,7 +60,7 @@ function Navbar() {
                 setProfileOpen(!profileOpen)
               }
             >
-              👤
+              <img src={userIcon} alt="profile" width="20" height="20" />
             </div>
 
             {profileOpen && (
@@ -88,7 +90,7 @@ function Navbar() {
             setMenuOpen(!menuOpen)
           }
         >
-          ☰
+          <img src={menuIcon} alt="menu" width="24" height="24" />
         </div>
 
       </div>
