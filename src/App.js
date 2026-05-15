@@ -2,6 +2,7 @@ import AppRoutes from "./routes/AppRoutes";
 
 import Navbar from "./components/layout/Navbar/Navbar";
 import Footer from "./components/layout/Footer/Footer";
+import FloatingAIBtn from "./components/common/FloatingAIBtn/FloatingAIBtn";
 
 import { useAuth } from "./context/AuthContext";
 
@@ -15,6 +16,8 @@ function App() {
       <div style={{ flexGrow: 1 }}>
         <AppRoutes />
       </div>
+      
+      {session && <FloatingAIBtn />}
       
       <Footer />
     </div>

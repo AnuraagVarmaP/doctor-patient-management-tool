@@ -52,6 +52,10 @@ function Navbar() {
             Patients
           </Link>
 
+          <Link to="/ai-assistant">
+            AI Assistant
+          </Link>
+
           <div className="profile-section">
 
             <div

@@ -8,6 +8,7 @@ import Register from "../pages/auth/Register";
 import Dashboard from "../pages/dashboard/Dashboard";
 import PatientList from "../pages/patients/PatientList";
 import PatientDetails from "../pages/patients/PatientDetails";
+import AIAssistant from "../pages/ai-assistant/AIAssistant";
 
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -48,6 +49,15 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <PatientDetails />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/ai-assistant"
+        element={
+          <ProtectedRoute>
+            <AIAssistant />
           </ProtectedRoute>
         }
       />
